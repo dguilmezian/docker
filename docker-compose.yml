@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./apps:/var/www/html
+    networks:
+      - app_net
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      #MYSQL_DATABASE: app_database
+      #MYSQL_USER: app_user
+      #MYSQL_PASSWORD: app_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app_net
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./apps:/var/www/html
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./fastcgi-php.conf:/etc/nginx/snippets/fastcgi-php.conf
+    networks:
+      - app_net
+
+networks:
+  app_net:
+
+volumes:
+  mysql_data:
